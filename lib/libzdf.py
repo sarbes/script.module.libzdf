@@ -28,10 +28,13 @@ class libzdf(lm4):
 			'libZdfListVideos':self.libZdfListVideos,
 			'libZdfListChannel':self.libZdfListChannel,
 			'libZdfListChannelDateVideos':self.libZdfListChannelDateVideos,
-			'libZdfSearch':self.libZdfSearch,
 			'libZdfListPage':self.libZdfListPage,
 			'libZdfListSport':self.libZdfListSport,
 			})
+
+		self.searchModes = {
+			'libZdfListSearch': self.libZdfListSearch,
+		}
 
 		self.playbackModes = {
 			'libZdfPlay':self.libZdfPlay,
@@ -51,6 +54,7 @@ class libzdf(lm4):
 		l.append({'metadata':{'name':self.translation(32132)}, 'params':{'mode':'libZdfListShows'}, 'type':'dir'})
 		l.append({'metadata':{'name':self.translation(32133)}, 'params':{'mode':'libZdfListChannel'}, 'type':'dir'})
 		l.append({'metadata':{'name':self.translation(32134)}, 'params':{'mode':'libZdfListPage', 'url':f'{self.baseApi}/search/documents?q=%2A&contentTypes=category'}, 'type':'dir'})
+		l.append({'metadata':{'name':self.translation(32139)}, 'params':{'mode':'libMediathekSearch', 'searchMode':'libZdfListSearch'}, 'type':'dir'})
 		return {'items':l,'name':'root'}
 		"""
 		l = []
@@ -121,12 +125,9 @@ class libzdf(lm4):
 		self.params['url'] = f"{self.baseApi}/cmdm/epg/broadcasts?from={self.params['yyyymmdd']}T00%3A00%3A00%2B02%3A00&to={self.params['yyyymmdd']}T23%3A59%3A59%2B02%3A00&limit=500&profile=teaser&tvServices={self.params['channel']}"
 		return self.libZdfListPage()
 		
-	def libZdfSearch(self):
-		pass
-		"""
-		search_string = libMediathek.getSearchString()
-		params['url'] = baseApi+'/search/documents?q='+search_string
-		return libZdfListPage()"""
+	def libZdfListSearch(self,searchString):
+		self.params['url'] = f'{self.baseApi}/search/documents?q={searchString}'
+		return self.libZdfListPage()
 			
 	def libZdfGetVideoHtml(self,url):
 		pass
