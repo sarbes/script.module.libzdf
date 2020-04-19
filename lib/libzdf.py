@@ -5,10 +5,6 @@ from libmediathek4 import lm4
 import libzdfjsonparser as jsonParser
 parser = jsonParser.parser()
 
-#baseApi = 'https://api.3sat.de'
-#baseApi = 'https://api.zdf.de'
-#tokenUrl = 'https://zdf-cdn.live.cellular.de/mediathekV2/token'
-
 
 #https://api.zdf.de/content/documents/zdf-startseite-100.json?profile=default
 #https://api.zdf.de/content/documents/meist-gesehen-100.json?profile=teaser
@@ -21,22 +17,21 @@ parser = jsonParser.parser()
 #https://api.3sat.de/content/documents/zdf/programm?profile=video-app&maxResults=200&airtimeDate=2019-06-09T12:00:00.000Z&includeNestedObjects=true
 
 
-#channels = 	['ZDF','ZDFinfo','ZDFneo',]
 class libzdf(lm4):
 	def __init__(self):
+		lm4.__init__(self)
 		self.defaultMode = 'libZdfListMain'
 
-		self.modes = {
+		self.modes.update({
 			'libZdfListMain':self.libZdfListMain,
 			'libZdfListShows':self.libZdfListShows,
 			'libZdfListVideos':self.libZdfListVideos,
 			'libZdfListChannel':self.libZdfListChannel,
-			'libZdfListChannelDate':self.libZdfListChannelDate,
 			'libZdfListChannelDateVideos':self.libZdfListChannelDateVideos,
 			'libZdfSearch':self.libZdfSearch,
 			'libZdfListPage':self.libZdfListPage,
 			'libZdfListSport':self.libZdfListSport,
-			}	
+			})
 
 		self.playbackModes = {
 			'libZdfPlay':self.libZdfPlay,
@@ -115,37 +110,16 @@ class libzdf(lm4):
 		return parser.getVideoUrl(self.params['url'])
 		
 	def libZdfPlayById(self):
-		#https://api.zdf.de/content/documents/know-how-biathlon-104.json?profile=player
 		return parser.getVideoUrlById(self.params['id'])
-		#return parser.getVideoUrl(params['url'])
 		
 	def libZdfListChannel(self):
 		l = []
 		for channel in self.channels:
-			l.append({'metadata':{'name':channel}, 'params':{'mode':'libZdfListChannelDate','channel':channel}, 'type':'dir'})
+			l.append({'metadata':{'name':channel}, 'params':{'mode':'libMediathekListDate','subParams':f'{{"mode":"libZdfListChannelDateVideos","channel":"{channel}"}}'}, 'type':'dir'})
 		return {'items':l,'name':'libZdfListChannel'}
-
-	def libZdfListChannelDate(self):
-		return self.populateDirDate('libZdfListChannelDateVideos',self.params['channel'],True)
-		#return libMediathek.populateDirDate('libZdfListChannelDateVideos',params['channel'],True)
 		
 	def libZdfListChannelDateVideos(self):
-		"""
-		if 'datum' in params:
-			datum = params['datum']
-			day = date.today() - timedelta(int(datum))
-			yyyymmdd = day.strftime('%Y-%m-%d')
-		else:
-			ddmmyyyy = libMediathek.dialogDate()
-			yyyymmdd = ddmmyyyy[4:8] + '-' + ddmmyyyy[2:4] + '-' + ddmmyyyy[0:2]
-		"""
 		self.params['url'] = f"{self.baseApi}/cmdm/epg/broadcasts?from={self.params['yyyymmdd']}T00%3A00%3A00%2B02%3A00&to={self.params['yyyymmdd']}T23%3A59%3A59%2B02%3A00&limit=500&profile=teaser&tvServices={self.params['channel']}"
-		#params['url'] = baseApi+'/content/documents/zdf/programm?profile=video-app&maxResults=200&airtimeDate='+yyyymmdd+'T00:00:00.000Z&includeNestedObjects=true
-		#params['url'] = baseApi+'/content/documents/zdf/programm?profile=video-app&maxResults=200&airtimeDate='+yyyymmdd+'T00:00:00.000Z&includeNestedObjects=true'
-		#params['url'] = baseApi+'/cmdm/dreisat/epg/broadcasts?from=2019-06-08T05%3A30%3A00%2B02%3A00&to=2019-06-09T05%3A30%3A00%2B02%3A00&limit=200&page=1&tvServices=3sat&order=asc&profile=teaser'
-		#params['url'] = baseApi+'/content/documents/sendung-verpasst-100.json?tvServices=arte'
-		
-
 		return self.libZdfListPage()
 		
 	def libZdfSearch(self):
