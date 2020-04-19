@@ -82,7 +82,6 @@ class libzdf(lm4):
 			return parser.getAZ()
 				
 	def libZdfListPage(self):
-		print('libZdfListPage')
 		return parser.parsePage(self.params['url'])
 
 	def libZdfListSport(self):
