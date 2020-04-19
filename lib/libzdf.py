@@ -52,15 +52,10 @@ class libzdf(lm4):
 	def libZdfListMain(self):
 		l = []
 		l.append({'metadata':{'name':self.translation(32031)}, 'params':{'mode':'libZdfListPage','url':f'{self.baseApi}/content/documents/meist-gesehen-100.json?profile=default'}, 'type':'dir'})
-		l.append({'metadata':{'name':self.translation(32031)+'2'}, 'params':{'mode':'libZdfListPage','url':f'{self.baseApi}/content/documents/filter-meist-gesehen-100.json?profile=page-video_episode_vod&limit=50'}, 'type':'dir'})
+		#l.append({'metadata':{'name':self.translation(32031)}, 'params':{'mode':'libZdfListPage','url':f'{self.baseApi}/content/documents/filter-meist-gesehen-100.json?profile=page-video_episode_vod&limit=50'}, 'type':'dir'})
 		l.append({'metadata':{'name':self.translation(32132)}, 'params':{'mode':'libZdfListShows'}, 'type':'dir'})
 		l.append({'metadata':{'name':self.translation(32133)}, 'params':{'mode':'libZdfListChannel'}, 'type':'dir'})
 		l.append({'metadata':{'name':self.translation(32134)}, 'params':{'mode':'libZdfListPage', 'url':f'{self.baseApi}/search/documents?q=%2A&contentTypes=category'}, 'type':'dir'})
-		
-		#l.append({'metadata':{'name':'TEST'}, 'params':{'mode':'libZdfListPage', 'url':f'{self.baseApi}/content/documents/serien-100.json?profile=navigation&contentTypes=topic'}, 'type':'dir'})
-		l.append({'metadata':{'name':'TEST'}, 'params':{'mode':'libZdfListPage', 'url':f'{self.baseApi}/content/documents/serien-100.json?contentTypes=brand'}, 'type':'dir'})
-
-		#l.append({'_name':'TEST', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/content/documents/serien-100.json?profile=default&contentTypes=topic'})
 		return {'items':l,'name':'root'}
 		"""
 		l = []
