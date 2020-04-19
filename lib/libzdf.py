@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from libmediathek4 import lm4
-#import libzdfjsonparser as libZdfJsonParser
 import libzdfjsonparser as jsonParser
 parser = jsonParser.parser()
 

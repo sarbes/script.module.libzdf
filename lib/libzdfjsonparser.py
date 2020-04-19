@@ -86,8 +86,6 @@ class parser:
 
 	def parsePage(self,url):
 		response = self._getU(url,True)
-		#print(response)
-		#lm4utils.f_write(lm4utils.pathUserdata('response.json'), response)
 		j = json.loads(response)
 		if   j['profile'] == 'http://zdf.de/rels/search/result':
 			return self._parseSearch(j)
@@ -111,10 +109,7 @@ class parser:
 	#def getAZ(self,uri='/content/documents/sendungen-100.json?profile=default'):
 	def getAZ(self,uri='/content/documents/sendungen-100.json?contentTypes=teaser'):
 		response = self._getU(self.baseApi+uri,True)
-		lm4utils.f_write(lm4utils.pathUserdata('response.json'), response)
 		j = json.loads(response)
-		letters = {}
-		l = []
 		for brand in j['brand']:
 			if 'title' in brand:
 				if 'teaser' in brand:
@@ -191,7 +186,6 @@ class parser:
 		self.d['metadata']['plot'] = target['teasertext']
 		self._grepArt(target)
 		self._grepActors(target)
-		#d['metadata']['_channel'] = 'ZDF'
 
 		#d['url'] = baseApi + target['http://zdf.de/rels/brand']['http://zdf.de/rels/target']['canonical']
 
@@ -202,7 +196,7 @@ class parser:
 			self.d['params']['mode'] = 'libZdfListPage'
 			self.d['type'] = 'dir'
 
-		elif target['contentType'] == 'brand' or target['contentType'] == 'category' or target['contentType'] == 'topic':
+		elif target['contentType'] in ['brand','category','topic']:
 			if target['hasVideo'] == False: return False
 
 			self.d['params']['url'] = self.baseApi + target['http://zdf.de/rels/search/page-video-counter-with-video']['self'].replace('&limit=0','&limit=100')
@@ -294,8 +288,6 @@ class parser:
 					if 'originalTitle' in item['http://zdf.de/rels/target']:
 						self.d['metadata']['tvshowtitle'] = item['http://zdf.de/rels/target']['originalTitle']
 
-
-		
 	def getVideoUrlById(self,id):
 		url = self.baseApi + '/content/documents/' + id + '.json?profile=player'
 		response = self._getU(url,True)
@@ -303,11 +295,10 @@ class parser:
 		url = self.baseApi + j['mainVideoContent']['http://zdf.de/rels/target']['http://zdf.de/rels/streams/ptmd-template'].replace('{playerId}',self.playerId)
 		d = getVideoUrl(url)
 		d['metadata'] = {}
-		d['metadata']['name'] = j['title'] + ' - ' + j['subtitle']
+		d['metadata']['name'] = f'{j["title"]} - {j["subtitle"]}'
 		d['metadata']['plot'] = j['teasertext']
 		d['metadata']['thumb'] = _grepArt(j['teaserImageRef'])
 		d['metadata']['duration'] = str(j['mainVideoContent']['http://zdf.de/rels/target']['duration'])
-		
 		return d
 		
 	def getVideoUrl(self,url):
