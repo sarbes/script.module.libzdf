@@ -223,6 +223,7 @@ class parser:
 				content = target['mainVideoContent']['http://zdf.de/rels/target']
 			elif 'mainContent' in target:
 				content = target['mainContent'][0]['videoContent'][0]['http://zdf.de/rels/target']
+			else: return False
 				
 			if 'duration' in content:
 				self.d['metadata']['duration'] = content['duration']
