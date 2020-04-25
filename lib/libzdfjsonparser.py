@@ -284,9 +284,9 @@ class parser:
 						if len(writers) != 0: self.d['metadata']['writers'] = writers
 						if len(directors) != 0: self.d['metadata']['directors'] = directors
 						if len(artists) != 0: self.d['metadata']['artists'] = artists
-					if 'text' in item['http://zdf.de/rels/target']:
+					if 'text' in item['http://zdf.de/rels/target'] and item['http://zdf.de/rels/target']['text'] != None:
 						self.d['metadata']['plot'] = item['http://zdf.de/rels/target']['text'].replace('<br/>','\n').replace('<b>','[B]').replace('</b>','[/B]')
-					if 'originalTitle' in item['http://zdf.de/rels/target']:
+					if 'originalTitle' in item['http://zdf.de/rels/target'] and item['http://zdf.de/rels/target']['originalTitle'] != None:
 						self.d['metadata']['tvshowtitle'] = item['http://zdf.de/rels/target']['originalTitle']
 
 	def getVideoUrlById(self,id):
