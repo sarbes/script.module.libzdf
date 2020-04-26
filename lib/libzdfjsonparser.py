@@ -119,7 +119,6 @@ class parser:
 		return self.result
 		
 	def _parseSearch(self,j):
-		l = []
 		for module in j['module']:
 			for result in module['filterRef']['resultsWithVideo']['http://zdf.de/rels/search/results']:
 				target = result['http://zdf.de/rels/target']
@@ -128,7 +127,6 @@ class parser:
 		return self.result
 				
 	def _parseSearchPage(self,j):
-		l = []
 		for result in j['http://zdf.de/rels/search/results']:
 			target = result['http://zdf.de/rels/target']
 			if not target['profile'] == 'http://zdf.de/rels/cmdm/broadcast-teaser':#filters out future broadcasts
@@ -136,7 +134,6 @@ class parser:
 		return self.result
 		
 	def _parsePageIndex(self,j):
-		l = []
 		for module in j['module']:
 			if 'teaser' in module:
 				for teaser in module['teaser']:
@@ -163,7 +160,6 @@ class parser:
 				target = broadcast['http://zdf.de/rels/content/video-page-teaser']
 				if broadcast['effectiveAirtimeBegin'] is not None:#TODO: find alternative for videos without this field
 					self.template['metadata']['aired'] = {'ISO8601':broadcast['effectiveAirtimeBegin']}
-					#self.template['type'] = 'date'
 					self._grepItem(target,'date')
 		return self.result
 
@@ -173,7 +169,6 @@ class parser:
 				target = broadcast['http://zdf.de/rels/content/video-page-teaser']
 				if broadcast['effectiveAirtimeBegin'] is not None:#TODO: find alternative for videos without this field
 					self.template['metadata']['aired'] = {'ISO8601':broadcast['effectiveAirtimeBegin']}
-					#self.template['type'] = 'date'
 					self._grepItem(target,'date')
 		return self.result
 
@@ -186,8 +181,6 @@ class parser:
 		self.d['metadata']['plot'] = target['teasertext']
 		self._grepArt(target)
 		self._grepActors(target)
-
-		#d['url'] = baseApi + target['http://zdf.de/rels/brand']['http://zdf.de/rels/target']['canonical']
 
 		if target['contentType'] == 'topic':
 			if target['hasVideo'] == False: return False
