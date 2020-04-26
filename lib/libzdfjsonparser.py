@@ -162,9 +162,9 @@ class parser:
 			if 'http://zdf.de/rels/content/video-page-teaser' in broadcast:
 				target = broadcast['http://zdf.de/rels/content/video-page-teaser']
 				if broadcast['effectiveAirtimeBegin'] is not None:#TODO: find alternative for videos without this field
-					self.template['metadata']['airedISO8601'] = broadcast['effectiveAirtimeBegin']
-					self.template['type'] = 'date'
-					self._grepItem(target)
+					self.template['metadata']['aired'] = {'ISO8601':broadcast['effectiveAirtimeBegin']}
+					#self.template['type'] = 'date'
+					self._grepItem(target,'date')
 		return self.result
 
 	def _parseTV(self,j):
@@ -172,12 +172,12 @@ class parser:
 			if 'http://zdf.de/rels/content/video-page-teaser' in broadcast:
 				target = broadcast['http://zdf.de/rels/content/video-page-teaser']
 				if broadcast['effectiveAirtimeBegin'] is not None:#TODO: find alternative for videos without this field
-					self.template['metadata']['airedISO8601'] = broadcast['effectiveAirtimeBegin']
-					self.template['type'] = 'date'
-					self._grepItem(target)
+					self.template['metadata']['aired'] = {'ISO8601':broadcast['effectiveAirtimeBegin']}
+					#self.template['type'] = 'date'
+					self._grepItem(target,'date')
 		return self.result
 
-	def _grepItem(self,target):
+	def _grepItem(self,target,forcedType=False):
 		if target['profile'] == 'http://zdf.de/rels/not-found':
 			return False
 
@@ -244,6 +244,8 @@ class parser:
 
 
 		if self.d:
+			if forcedType:
+				self.d['type'] = forcedType
 			self.result['items'].append(self.d)
 			return True
 		else:
