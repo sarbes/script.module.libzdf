@@ -96,8 +96,8 @@ class parser:
 			return self._parsePageIndex2(j)
 		elif j['profile'] in ['http://zdf.de/rels/content/content-filter','http://zdf.de/rels/content/content-filter-page-video_episode_vod']:
 			return self._parseContentFilter(j)
-		elif j['profile'] in ['http://zdf.de/rels/content/page-index-teaser','http://zdf.de/rels/content/page-index-video-app-teaser']:
-			return self._parseTeaser(j)#not implemented atm
+		#elif j['profile'] in ['http://zdf.de/rels/content/page-index-teaser','http://zdf.de/rels/content/page-index-video-app-teaser']:
+		#	return self._parseTeaser(j)#not implemented atm
 		elif j['profile'] == 'http://zdf.de/rels/content/special-page-live-tv-video-app':
 			return self._parseTV(j)
 		elif j['profile'] == 'http://zdf.de/rels/cmdm/resultpage-broadcasts':
@@ -106,7 +106,6 @@ class parser:
 			log('Unknown profile: ' + j['profile'])
 			raise
 
-	#def getAZ(self,uri='/content/documents/sendungen-100.json?profile=default'):
 	def getAZ(self,uri='/content/documents/sendungen-100.json?contentTypes=teaser'):
 		response = self._getU(self.baseApi+uri,True)
 		j = json.loads(response)

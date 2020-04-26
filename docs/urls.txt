@@ -1,1 +1,0 @@
-https://api.zdf.de/search/typeahead?context=user&q=sturm%20der%20liebe&abName=abtest-update-2020-01-10&abGroup=gruppe-d

@@ -28,7 +28,6 @@ class libzdf(lm4):
 			'libZdfListChannel':self.libZdfListChannel,
 			'libZdfListChannelDateVideos':self.libZdfListChannelDateVideos,
 			'libZdfListPage':self.libZdfListPage,
-			'libZdfListSport':self.libZdfListSport,
 			})
 
 		self.searchModes = {
@@ -55,29 +54,6 @@ class libzdf(lm4):
 		l.append({'metadata':{'name':self.translation(32134)}, 'params':{'mode':'libZdfListPage', 'url':f'{self.baseApi}/search/documents?q=%2A&contentTypes=category'}, 'type':'dir'})
 		l.append({'metadata':{'name':self.translation(32139)}, 'params':{'mode':'libMediathekSearch', 'searchMode':'libZdfListSearch'}, 'type':'dir'})
 		return {'items':l,'name':'root'}
-		"""
-		l = []
-		l.append({'_name':translation(31031), 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/content/documents/meist-gesehen-100.json?profile=default'})
-		l.append({'_name':'Sporttest1', 'mode':'libZdfListSport', '_type': 'dir', 'url':baseApi+'/content/documents/zdf/sport?profile=navigation'})
-		l.append({'_name':'Sporttest1Frauenfussball', 'mode':'libZdfListSport', '_type': 'dir', 'url':baseApi+'/content/documents/fifa-frauen-wm-2019-spiele-in-voller-laenge-100.json?profile=default'})
-		l.append({'_name':'Sporttest2', 'mode':'libZdfListSport', '_type': 'dir', 'url':baseApi+'/content/documents/leichtathletik-wm-live-livestream-ergebnisse-zeitplan-100.json?profile=default'})
-		l.append({'_name':'Sporttest3 ALLE LIVESTREAMS', 'mode':'libZdfListSport', '_type': 'dir', 'url':baseApi+'/content/documents/SCMS_6f8a3ea6-d778-4bdc-9042-82c6e438a7be.json?profile=default'})
-		l.append({'_name':'Sporttest4 Leichta', 'mode':'libZdfListSport', '_type': 'dir', 'url':baseApi+'/content/documents/SCMS_6528733f-d1d9-41a4-9bdd-a88c9d100f05.json?profile=default'})
-		l.append({'_name':'Sporttest5 Leichta', 'mode':'libZdfListSport', '_type': 'dir', 'url':baseApi+'/content/documents/leichtathletik-wm-live-livestream-ergebnisse-zeitplan-100.json?profile=default'})
-		l.append({'_name':translation(31032), 'mode':'libZdfListShows', '_type': 'dir'})
-		l.append({'_name':translation(31033), 'mode':'libZdfListChannel', '_type': 'dir'})
-		l.append({'_name':translation(31034), 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/search/documents?q=%2A&contentTypes=category'})
-		l.append({'_name':'TEST', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/content/documents/serien-100.json?profile=default&contentTypes=topic'})
-		l.append({'_name':'TEST2', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/content/documents/zdf/serien/serien-bereich-100.json?profile=default&maxResults=2&limit=2& =brand'})
-		l.append({'_name':'TEST3', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/cmdm/brands/0ec8a12b-3dca-4fa9-ad54-2893317fdac3?profile=default'})
-		#l.append({'_name':'TEST42', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/search/documents?q=%2A&contentTypes=brand&paths=%2Fzdf%2Fserien%2F&limit=50'})
-		l.append({'_name':'TEST43', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/search/documents?q=%2A&contentTypes=teaserCategory&paths=%2Fzdf%2Fserien%2F&limit=10'})
-		l.append({'_name':'TEST4', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/search/documents?q=%2A&profile=teaser&paths=%2Fzdf%2Fserien%2F&limit=50'})
-		l.append({'_name':'TEST5', 'mode':'libZdfListPage', '_type': 'dir', 'url':baseApi+'/search/documents?q=%2A&paths=%2Fzdf%2Fserien%2F&limit=50'})
-		
-		l.append({'_name':translation(31039), 'mode':'libZdfSearch',   '_type': 'dir'})
-		return l"""
-		
 	def libZdfListShows(self):
 		if 'uri' in self.params:
 			return parser.getAZ(self.params['uri'])
@@ -86,24 +62,6 @@ class libzdf(lm4):
 				
 	def libZdfListPage(self):
 		return parser.parsePage(self.params['url'])
-
-	def libZdfListSport(self):
-		return
-		"""
-		l = libZdfListPage()
-		for item in l:
-			homeTeam,guestTeam = item['_name'].replace(u' in voller Länge','').split(u' - ')
-			item['_type'] = 'sport'
-			item['_customprops'] = {}
-
-			item['_customprops']['rightTeamName'] = guestTeam
-			item['_customprops']['rightTeamScore'] = ''
-			item['_customprops']['rightTeamIcon'] = ''
-			item['_customprops']['leftTeamName'] = homeTeam
-			item['_customprops']['leftTeamScore'] = ''
-			item['_customprops']['leftTeamIcon'] = ''
-			item['_customprops']['date'] = ''
-		return l"""
 		
 	def libZdfListVideos(self):
 		return parser.getVideos(self.params['url'])
@@ -128,8 +86,3 @@ class libzdf(lm4):
 		self.params['url'] = f'{self.baseApi}/search/documents?q={searchString}'
 		return self.libZdfListPage()
 			
-	def libZdfGetVideoHtml(self,url):
-		pass
-		#import re
-		#response = libMediathek.getUrl(url)
-		#return parser.getVideoUrl(re.compile('"contentUrl": "(.+?)"', re.DOTALL).findall(response)[0])
