@@ -27,6 +27,8 @@ class parser:
 		self.template = {'params':{}, 'metadata':{'art':{}}, 'type':'video'}
 		self.playerId = 'ngplayer_2_3'
 		#self.playerId = 'ngplayer_2_4'
+		#self.playerId = 'ngplayer_2_5'
+		#self.playerId = 'ngplayer_2_2_modul'
 		#self.playerId = 'chromecast_1'
 		#self.playerId = 'android_native_1'
 		#self.playerId = 'android_native_2'
@@ -35,54 +37,61 @@ class parser:
 		#self.playerId = 'smarttv_2'
 		#self.playerId = 'smarttv_3'
 		#self.playerId = 'smarttv_4'
+		#self.playerId = 'smarttv_5'
 		#self.playerId = 'ios_native_1'
 		#self.playerId = 'ios_native_2'
 		#self.playerId = 'voice_1'
 		#self.playerId = 'portal'
 
 	def _getTokenFromUrl(self):
-		r = requests.get(tokenUrl)
-		token = r.json()['token'].encode('utf-8')
+		r = requests.get(self.tokenUrl)
+		token = r.json()['token']
 		lm4utils.f_mkdir(lm4utils.pathUserdata(''))
 		lm4utils.f_write(lm4utils.pathUserdata('token'), token)
 		return token
 
 	def _getTokenFromAPI(self):
-		headers = {'user-agent': userAgent,'Host':baseApi.split('/')[2]}
-		r = requests.get(f'{baseApi}/oauth/getApiToken',headers=headers)
+		headers = {'user-agent': self.userAgent,'Host':self.baseApi.split('/')[2]}
+		r = requests.get(f'{self.baseApi}/oauth/getApiToken',headers=headers)
 		wwwAuth = r.headers['WWW-Authenticate']
 
 		realm      = re.compile('Digest realm="(.+?)"', re.DOTALL).findall(wwwAuth)[0]
 		qop        = re.compile('qop="(.+?)"', re.DOTALL).findall(wwwAuth)[0]
 		nonce      = re.compile('nonce="(.+?)"', re.DOTALL).findall(wwwAuth)[0]
-		uri        = f'{baseApi}/oauth/getApiToken'
+		uri        = f'{self.baseApi}/oauth/getApiToken'
 		nonceCount = '00000002'
 		cnonce     = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
 
-		HA1        = hashlib.md5(f'{self.API_CLIENT_ID}:{realm}:{self.API_CLIENT_KEY}').hexdigest()
-		HA2        = hashlib.md5(f'GET:{uri}').hexdigest()
-		response   = hashlib.md5(f'{HA1}:{nonce}:{nonceCount}:{cnonce}:{qop}:{HA2}').hexdigest()
+		HA1        = hashlib.md5(f'{self.API_CLIENT_ID}:{realm}:{self.API_CLIENT_KEY}'.encode('utf-8')).hexdigest()
+		HA2        = hashlib.md5(f'GET:{uri}'.encode('utf-8')).hexdigest()
+		response   = hashlib.md5(f'{HA1}:{nonce}:{nonceCount}:{cnonce}:{qop}:{HA2}'.encode('utf-8')).hexdigest()
 
 		headers['authorization'] = f'Digest username="{self.API_CLIENT_ID}", realm="{realm}", nonce="{nonce}", uri="{uri}", response="{response}", opaque="null", qop={qop}, nc={nonceCount}, cnonce="{cnonce}"'
 
-		j = requests.get(f'{baseApi}/oauth/getApiToken',headers=headers).json()
+		j = requests.get(f'{self.baseApi}/oauth/getApiToken',headers=headers).json()
 
-		token = j['apiToken'].encode('utf-8')
+		token = j['apiToken']
 		lm4utils.f_mkdir(lm4utils.pathUserdata(''))
 		lm4utils.f_write(lm4utils.pathUserdata('token'), token)
 		return token
 
 	def _getU(self,url,Menu=False):
-		try:
-			header = {'Api-Auth': 'Bearer '+lm4utils.f_open(lm4utils.pathUserdata('token')), 'Accept-Encoding': 'gzip, deflate'}
-			response = requests.get(url,headers=header).text
-		except:
-			if tokenUrl:
-				header = {'Api-Auth': 'Bearer '+self._getTokenFromUrl(), 'Accept-Encoding': 'gzip, deflate'}
-			else:
-				header = {'Api-Auth': 'Bearer '+self._getTokenFromAPI(), 'Accept-Encoding': 'gzip, deflate'}
-			response = requests.get(url,headers=header).text
-		return response
+		token = lm4utils.f_open(lm4utils.pathUserdata('token'))
+		if token == '':
+			token = self._getToken()
+		header = {'Api-Auth': f'Bearer {token}', 'Accept-Encoding': 'gzip, deflate'}
+		response = requests.get(url,headers=header)
+		if response.status_code == 404 or response.text == '':
+			token = lm4utils.f_open(lm4utils.pathUserdata('token'))
+			header = {'Api-Auth': f'Bearer {token}', 'Accept-Encoding': 'gzip, deflate'}
+			response = requests.get(url,headers=header)
+		return response.text
+
+	def _getToken(self):
+		if self.tokenUrl:
+			return self._getTokenFromUrl()
+		else:
+			return self._getTokenFromAPI()
 
 	def parsePage(self,url):
 		response = self._getU(url,True)
@@ -172,8 +181,12 @@ class parser:
 		return self.result
 
 	def _grepItem(self,target,forcedType=False):
-		if target['profile'] == 'http://zdf.de/rels/not-found':
+		if target['profile'] in ['http://zdf.de/rels/not-found','http://zdf.de/rels/gone']:
 			return False
+		else:
+			self._grepItemDefault(target,forcedType)
+
+	def _grepItemDefault(self,target,forcedType=False):
 
 		self.d = copy.deepcopy(self.template)
 		self.d['metadata']['name'] = target['teaserHeadline']
@@ -189,6 +202,7 @@ class parser:
 			self.d['type'] = 'dir'
 
 		elif target['contentType'] in ['brand','category','topic']:
+			if not 'hasVideo' in target: return False
 			if target['hasVideo'] == False: return False
 
 			self.d['params']['url'] = self.baseApi + target['http://zdf.de/rels/search/page-video-counter-with-video']['self'].replace('&limit=0','&limit=100')
